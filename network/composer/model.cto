@@ -39,19 +39,19 @@ participant Importer identified by importerId {
 }
 
 enum AssetType {
-  o Medicine
-  o Fuel
-  o Trucks
-  o Wires
-  o Tables
-  o Laptops
-  o Chairs
+  o MEDICINE
+  o FUEL
+  o TRUCKS
+  o WIRES
+  o TABLES
+  o LAPTOPS
+  o CHAIRS
 }
 
 enum ShipmentStatus {
-  o Created
-  o Intransit
-  o Arrived
+  o CREATED
+  o IN_TRANSIT
+  o ARRIVED
 }
 
 enum CompassDirection {
