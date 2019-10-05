@@ -148,3 +148,83 @@ services:
     ports:
       - 12051:7051
       - 12053:7053
+
+  peer0.entertainment.reliance-network.com:
+    container_name: peer0.entertainment.reliance-network.com
+    extends:
+      file: peer-base.yaml
+      service: peer-base
+    environment:
+      - CORE_PEER_ID=peer0.entertainment.reliance-network.com
+      - CORE_PEER_ADDRESS=peer0.entertainment.reliance-network.com:7051
+      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer0.entertainment.reliance-network.com:7051
+      - CORE_PEER_GOSSIP_BOOTSTRAP=peer1.entertainment.reliance-network.com:7051
+      - CORE_PEER_LOCALMSPID=EntertainmentMSP
+    volumes:
+        - /var/run/:/host/var/run/
+        - ../crypto-config/peerOrganizations/entertainment.reliance-network.com/peers/peer0.entertainment.reliance-network.com/msp:/etc/hyperledger/fabric/msp
+        - ../crypto-config/peerOrganizations/entertainment.reliance-network.com/peers/peer0.entertainment.reliance-network.com/tls:/etc/hyperledger/fabric/tls
+        - peer0.entertainment.reliance-network.com:/var/hyperledger/production
+    ports:
+      - 13051:7051
+      - 13053:7053
+
+  peer1.entertainment.reliance-network.com:
+    container_name: peer1.entertainment.reliance-network.com
+    extends:
+      file: peer-base.yaml
+      service: peer-base
+    environment:
+      - CORE_PEER_ID=peer1.entertainment.reliance-network.com
+      - CORE_PEER_ADDRESS=peer1.entertainment.reliance-network.com:7051
+      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer1.entertainment.reliance-network.com:7051
+      - CORE_PEER_GOSSIP_BOOTSTRAP=peer0.entertainment.reliance-network.com:7051
+      - CORE_PEER_LOCALMSPID=EntertainmentMSP
+    volumes:
+        - /var/run/:/host/var/run/
+        - ../crypto-config/peerOrganizations/entertainment.reliance-network.com/peers/peer1.entertainment.reliance-network.com/msp:/etc/hyperledger/fabric/msp
+        - ../crypto-config/peerOrganizations/entertainment.reliance-network.com/peers/peer1.entertainment.reliance-network.com/tls:/etc/hyperledger/fabric/tls
+        - peer1.entertainment.reliance-network.com:/var/hyperledger/production
+    ports:
+      - 14051:7051
+      - 14053:7053
+
+  peer0.capital.reliance-network.com:
+    container_name: peer0.capital.reliance-network.com
+    extends:
+      file: peer-base.yaml
+      service: peer-base
+    environment:
+      - CORE_PEER_ID=peer0.capital.reliance-network.com
+      - CORE_PEER_ADDRESS=peer0.capital.reliance-network.com:7051
+      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer0.capital.reliance-network.com:7051
+      - CORE_PEER_GOSSIP_BOOTSTRAP=peer1.capital.reliance-network.com:7051
+      - CORE_PEER_LOCALMSPID=CapitalMSP
+    volumes:
+        - /var/run/:/host/var/run/
+        - ../crypto-config/peerOrganizations/capital.reliance-network.com/peers/peer0.capital.reliance-network.com/msp:/etc/hyperledger/fabric/msp
+        - ../crypto-config/peerOrganizations/capital.reliance-network.com/peers/peer0.capital.reliance-network.com/tls:/etc/hyperledger/fabric/tls
+        - peer0.capital.reliance-network.com:/var/hyperledger/production
+    ports:
+      - 15051:7051
+      - 15053:7053
+
+  peer1.capital.reliance-network.com:
+    container_name: peer1.capital.reliance-network.com
+    extends:
+      file: peer-base.yaml
+      service: peer-base
+    environment:
+      - CORE_PEER_ID=peer1.capital.reliance-network.com
+      - CORE_PEER_ADDRESS=peer1.capital.reliance-network.com:7051
+      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer1.capital.reliance-network.com:7051
+      - CORE_PEER_GOSSIP_BOOTSTRAP=peer0.capital.reliance-network.com:7051
+      - CORE_PEER_LOCALMSPID=CapitalMSP
+    volumes:
+        - /var/run/:/host/var/run/
+        - ../crypto-config/peerOrganizations/capital.reliance-network.com/peers/peer1.capital.reliance-network.com/msp:/etc/hyperledger/fabric/msp
+        - ../crypto-config/peerOrganizations/capital.reliance-network.com/peers/peer1.capital.reliance-network.com/tls:/etc/hyperledger/fabric/tls
+        - peer1.capital.reliance-network.com:/var/hyperledger/production
+    ports:
+      - 16051:7051
+      - 16053:7053
