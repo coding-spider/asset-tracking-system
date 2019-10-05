@@ -9,36 +9,51 @@ Organizations:
     ID: InfrastructureMSP
     MSPDir: crypto-config/peerOrganizations/infrastructure.reliance-network.com/msp
     AnchorPeers:
-      - Host: peer0.amazon.upgrad-network.com
+      - Host: peer0.infrastructure.reliance-network.com
         Port: 7051
 
-  - &Flipkart
-    Name: FlipkartMSP
-    ID: FlipkartMSP
-    MSPDir: crypto-config/peerOrganizations/flipkart.upgrad-network.com/msp
+  - &Power
+    Name: PowerMSP
+    ID: PowerMSP
+    MSPDir: crypto-config/peerOrganizations/power.reliance-network.com/msp
     AnchorPeers:
-      - Host: peer0.flipkart.upgrad-network.com
+      - Host: peer0.power.reliance-network.com
         Port: 9051
 
-  - &PayTM
-    Name: PayTMMSP
-    ID: PayTMMSP
-    MSPDir: crypto-config/peerOrganizations/paytm.upgrad-network.com/msp
+  - &Communications
+    Name: CommunicationsMSP
+    ID: CommunicationsMSP
+    MSPDir: crypto-config/peerOrganizations/communications.reliance-network.com/msp
     AnchorPeers:
-      - Host: peer0.paytm.upgrad-network.com
+      - Host: peer0.communications.reliance-network.com
         Port: 11051
 
+  - &Entertainment
+    Name: EntertainmentMSP
+    ID: EntertainmentMSP
+    MSPDir: crypto-config/peerOrganizations/entertainment.reliance-network.com/msp
+    AnchorPeers:
+      - Host: peer0.entertainment.reliance-network.com
+        Port: 13051
+
+  - &Capital
+    Name: CapitalMSP
+    ID: CapitalMSP
+    MSPDir: crypto-config/peerOrganizations/capital.reliance-network.com/msp
+    AnchorPeers:
+      - Host: peer0.capital.reliance-network.com
+        Port: 15051
 
 
 #Capabilities
 
 Capabilities:
   Global: &ChannelCapabilities
-    V1_1: true
+    V1_3: true
   Orderer: &OrdererCapabilities
     V1_1: true
   Application: &ApplicationCapabilities
-    V1_2: true
+    V1_3: true
 
 #Application
 
@@ -50,11 +65,11 @@ Orderer: &OrdererDefaults
 
   OrdererType: solo
   Addresses:
-    - orderer.upgrad-network.com:7050
-  BatchTimeout: 2s
+    - orderer.reliance-network.com:7050
+  BatchTimeout: 5s
   BatchSize:
     MaxMessageCount: 10
-    AbsoluteMaxBytes: 99 MB
+    AbsoluteMaxBytes: 256 MB
     PreferredMaxBytes: 512 KB
   Kafka:
     Brokers: 
@@ -78,16 +93,20 @@ Profiles:
       Consortiums:
         SampleConsortium:
           Organizations:
-            - *Amazon
-            - *Flipkart
-            - *PayTM
+            - *Infrastructure
+            - *Power
+            - *Communications
+            - *Entertainment
+            - *Capital
     ChannelThreeOrgs:
       Consortium: SampleConsortium
       Application:
         <<: *ApplicationDefaults
         Organizations:
-          - *Amazon
-          - *Flipkart
-          - *PayTM
+          - *Infrastructure
+          - *Power
+          - *Communications
+          - *Entertainment
+          - *Capital
         Capabilities:
           <<: *ApplicationCapabilities
