@@ -42,7 +42,7 @@ async function AccelerationReading(tx) {
     event.message = "Acceleration Breached";
     event.latitude = tx.latitude;
     event.longitude = tx.longitude;
-    event.readingTime = new Date();
+    event.readingTime = tx.readingTime || new Date();
     event.shipment = shipment;
     emit(event);
   }
@@ -50,5 +50,36 @@ async function AccelerationReading(tx) {
   //Adding this transaction in Acceleration Readings of shipment
   const shipmentRegistry = await getAssetRegistry('com.reliancenetwork.ats.Shipment');
   shipment.accelerationReadings.push(tx);
+  await shipmentRegistry.update(shipment);
+}
+
+/**
+ * Create a new property
+ * @param {com.reliancenetwork.ats.TemperatureReading} tx
+ * @transaction
+ */
+
+async function TemperatureReading(tx) {
+  const factory = getFactory();
+  const me = getCurrentParticipant();
+
+  let shipment = tx.shipment;
+  let contract = tx.shipment.contract;
+
+  //Check temerature with that of allowed limit in the contract
+  if (tx.celcius <= contract.minimumTemperature || tx.celcius >= contract.maximumTemperature) {
+    let event = getFactory().newEvent('com.reliancenetwork.ats', 'TemperatureThreshold');
+    event.temperature = tx.celcius;
+    event.message = "Temperature Breached";
+    event.latitude = tx.latitude;
+    event.longitude = tx.longitude;
+    event.readingTime = tx.readingTime || new Date();
+    event.shipment = shipment;
+    emit(event);
+  }
+
+  //Adding this transaction in Temperature Readings of shipment
+  const shipmentRegistry = await getAssetRegistry('com.reliancenetwork.ats.Shipment');
+  shipment.temperatureReadings.push(tx);
   await shipmentRegistry.update(shipment);
 }
