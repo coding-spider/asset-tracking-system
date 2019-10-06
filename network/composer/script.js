@@ -83,3 +83,33 @@ async function TemperatureReading(tx) {
   shipment.temperatureReadings.push(tx);
   await shipmentRegistry.update(shipment);
 }
+
+/**
+ * Create a new property
+ * @param {com.reliancenetwork.ats.GPSReading} tx
+ * @transaction
+ */
+
+async function GPSReading(tx) {
+  const factory = getFactory();
+  const me = getCurrentParticipant();
+
+  let shipment = tx.shipment;
+  let contract = tx.shipment.contract;
+
+  //Assumption: The address of importer/exporter is stored in format: latitude + latitudeDirection + longitude + longitudeDirection;
+  let shipmentCurrentPosition = tx.latitude + tx.latitudeDirection + tx.longitude + tx.longitudeDirection;
+
+  //Check if shipment reached the destination
+  if (shipmentCurrentPosition == contract.importer.address) {
+    let event = getFactory().newEvent('com.reliancenetwork.ats', 'ShipmentInPort');
+    event.message = "Shipment Arrived";
+    event.shipment = shipment;
+    emit(event);
+  }
+
+  //Adding this transaction in GPS Readings of shipment
+  const shipmentRegistry = await getAssetRegistry('com.reliancenetwork.ats.Shipment');
+  shipment.gpsReadings.push(tx);
+  await shipmentRegistry.update(shipment);
+}
