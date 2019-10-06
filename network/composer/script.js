@@ -113,3 +113,48 @@ async function GPSReading(tx) {
   shipment.gpsReadings.push(tx);
   await shipmentRegistry.update(shipment);
 }
+
+/**
+ * Create a new property
+ * @param {com.reliancenetwork.ats.ShipmentReceived} tx
+ * @transaction
+ */
+
+async function ShipmentReceived(tx) {
+  const factory = getFactory();
+  const me = getCurrentParticipant();
+
+  let shipment = tx.shipment;
+  let contract = tx.shipment.contract;
+
+  let totalPayout = shipment.unitCount * contract.unitPrice;
+  shipment.shipmentStatus = "ARRIVED";
+
+  //Setting totalPayout to 0 if shipment is deleyed
+  if (new Date().getTime() > new Date(contract.arrivalDateTime).getTime()) {
+    totalPayout = 0;
+  }
+
+  //TODO: Penalty Calculation Logic
+  let totalPenalty = 0;
+
+  totalPayout -= totalPenalty;
+
+  //Updating Balances
+  contract.importer.accountBalance -= totalPayout;
+  contract.exporter.accountBalance += (totalPayout / 2);
+  contract.shipper.accountBalance += (totalPayout / 2);
+
+  const importerRegistry = await getParticipantRegistry('com.reliancenetwork.ats.Importer');
+  await importerRegistry.update(contract.importer);
+
+  const exporterRegistry = await getParticipantRegistry('com.reliancenetwork.ats.Exporter');
+  await exporterRegistry.update(contract.exporter);
+
+  const shipperRegistry = await getParticipantRegistry('com.reliancenetwork.ats.Shipper');
+  await shipperRegistry.update(contract.shipper);
+
+  //Updating Shipment With the Arrived Status
+  const shipmentRegistry = await getAssetRegistry('com.reliancenetwork.ats.Shipment');
+  await shipmentRegistry.update(shipment);
+}
