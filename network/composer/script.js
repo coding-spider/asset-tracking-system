@@ -34,7 +34,7 @@ async function AccelerationReading(tx) {
 
 
   //Check acceleration Maginitude with that of allowed limit in the contract
-  if (accelerationMagnitude >= contract.maximumAcceleration) {
+  if (accelerationMagnitude > contract.maximumAcceleration) {
     let event = getFactory().newEvent('com.reliancenetwork.ats', 'AccelerationThreshold');
     event.accelerationX = tx.accelerationX;
     event.accelerationY = tx.accelerationY;
@@ -67,7 +67,7 @@ async function TemperatureReading(tx) {
   let contract = tx.shipment.contract;
 
   //Check temerature with that of allowed limit in the contract
-  if (tx.celcius <= contract.minimumTemperature || tx.celcius >= contract.maximumTemperature) {
+  if (tx.celcius < contract.minimumTemperature || tx.celcius > contract.maximumTemperature) {
     let event = getFactory().newEvent('com.reliancenetwork.ats', 'TemperatureThreshold');
     event.temperature = tx.celcius;
     event.message = "Temperature Breached";
@@ -135,10 +135,37 @@ async function ShipmentReceived(tx) {
     totalPayout = 0;
   }
 
-  //TODO: Penalty Calculation Logic
-  let totalPenalty = 0;
+  //Penalty Calculation Logic
+  let unitPenaltyFactor = 0;
 
+  // Temperature Penalty Calculation
+  shipment.temperatureReadings.forEach(function (temperatureReading) {
+    if (temperatureReading.celcius < contract.minimumTemperature) {
+      unitPenaltyFactor += (contract.minimumTemperature - temperatureReading.celcius) * contract.minimumPenaltyFactor;
+    }
+
+    if (temperatureReading.celcius > contract.maximumTemperature) {
+      unitPenaltyFactor += (temperatureReading.celcius - contract.maximumTemperature) * contract.maximumPenaltyFactor;
+    }
+  });
+
+  // Acceleration Penalty Calculation
+  shipment.accelerationReadings.forEach(function (accelerationReading) {
+    const accelerationMagnitude = Math.sqrt(accelerationReading.accelerationX * accelerationReading.accelerationX +
+      accelerationReading.accelerationY * accelerationReading.accelerationY +
+      accelerationReading.accelerationZ * accelerationReading.accelerationZ);
+    if (accelerationMagnitude > contract.maximumAcceleration) {
+      unitPenaltyFactor += (accelerationMagnitude - contract.maximumAcceleration) * contract.maximumPenaltyFactor;
+    }
+  });
+
+  let totalPenalty = unitPenaltyFactor * shipment.unitCount;
   totalPayout -= totalPenalty;
+
+  // handling a case where totalPayout can be negative if penaty is levied
+  if (totalPayout < 0) {
+    totalPayout = 0;
+  }
 
   //Updating Balances
   contract.importer.accountBalance -= totalPayout;
